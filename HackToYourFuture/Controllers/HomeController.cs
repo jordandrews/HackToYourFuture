@@ -98,13 +98,14 @@ namespace HackToYourFuture.Controllers
             }
         }
 
-        public ActionResult Calculate()
+        public JsonResult Calculate()
         {
             using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
                 var places = (from x in database.Places
                              select x).ToArray();
                 int[] finishedPlaceIds = new int[places.Length];
+                Place[] finishedPlaces = new Place[places.Length];
 
                 Place firstPlace1 = null;
                 Place firstPlace2 = null;
@@ -171,12 +172,49 @@ namespace HackToYourFuture.Controllers
                     }
                 }
 
-                finishedPlaceIds[0] = firstPlace1.PlaceID;
-                finishedPlaceIds[1] = firstPlace2.PlaceID;
+                /*
+                 * Finally, from the third point, select each of the shortest points.
+                 */
 
+                finishedPlaces[0] = firstPlace1;
+                finishedPlaces[1] = firstPlace2;
+                finishedPlaces[2] = firstPlace3;
+                Place[] revisedPlaces = places.Where(val => val.PlaceID != firstPlace1.PlaceID && val.PlaceID != firstPlace2.PlaceID && val.PlaceID != firstPlace3.PlaceID).ToArray();
+                for (int i=3; i<places.Length;i++)
+                {
+                    Place placeToAdd = null;
+                    double lowestDoubleYet = 100000;
+                    foreach (var item in revisedPlaces)
+                    {
+                        double tempDouble = Distance(finishedPlaces[i - 1], item);
+                        if (tempDouble < lowestDoubleYet)
+                        {
+                            lowestDoubleYet = tempDouble;
+                            placeToAdd = item;
+                        }
+                    }
+                    revisedPlaces = revisedPlaces.Where(val => val.PlaceID != placeToAdd.PlaceID).ToArray();
+                    finishedPlaces[i] = placeToAdd;
+                }
 
+                List<JsonPlace> myJson = new List<JsonPlace>();
+                foreach (var item in finishedPlaces)
+                {
+                    JsonPlace place = new JsonPlace
+                    {
+                        Latitude = item.Latitude,
+                        Longitude = item.Longitude,
+                        PlaceName = item.PlaceName
+                    };
 
-                return View();
+                    myJson.Add(place);
+
+                }
+
+                JavaScriptSerializer newSerializer = new JavaScriptSerializer();
+                String jsonList = newSerializer.Serialize(myJson);
+
+                return Json(jsonList, JsonRequestBehavior.AllowGet);
             }
             
         }

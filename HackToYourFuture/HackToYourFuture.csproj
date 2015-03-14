@@ -155,6 +155,7 @@
       <DependentUpon>HackModel2.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\JsonComment.cs" />
+    <Compile Include="Models\JsonPlace.cs" />
     <Compile Include="Models\Place.cs">
       <DependentUpon>HackModel2.tt</DependentUpon>
     </Compile>
