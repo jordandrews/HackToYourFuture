@@ -22,7 +22,7 @@ namespace HackToYourFuture.Models
     
         public int PlaceID { get; set; }
         [Display(Name="Place Name")]
-        [Required()]
+        [Required(ErrorMessage="Place name is required.")]
         public string PlaceName { get; set; }
         public Nullable<double> Longitude { get; set; }
         public Nullable<double> Latitude { get; set; }

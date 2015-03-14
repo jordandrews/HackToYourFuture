@@ -13,19 +13,14 @@ namespace HackToYourFuture.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index(int placeId = 0)
+        public ActionResult Index()
         {
             using (HackToYourFutureEntities database = new HackToYourFutureEntities())
             {
-                var comments = (from x in database.Comments
-                               where x.PlaceID == placeId
-                               select x).ToList();
-
                 var places = (from x in database.Places
                              select x).ToList();
                 IndexViewModel viewModel = new IndexViewModel()
                 {
-                    Comments = comments,
                     Places = places
                 };
                 return View(viewModel);
@@ -53,8 +48,10 @@ namespace HackToYourFuture.Controllers
         {
             using (HackToYourFutureEntities database = new HackToYourFutureEntities())
             {
+                viewModel.NewComment.DateTime = DateTime.Now;
 
-
+                database.Comments.Add(viewModel.NewComment);
+                database.SaveChanges();
                 return RedirectToAction("Index");
             }
         }
@@ -63,9 +60,14 @@ namespace HackToYourFuture.Controllers
         {
             using (HackToYourFutureEntities database = new HackToYourFutureEntities())
             {
+                viewModel.NewComment.DateTime = DateTime.Now;
 
+                database.Comments.Add(viewModel.NewComment);
+                database.Places.Add(viewModel.NewPlace);
+
+                database.SaveChanges();
+                return RedirectToAction("Index");
             }
-            return RedirectToAction("Index");
         }
 
     }
