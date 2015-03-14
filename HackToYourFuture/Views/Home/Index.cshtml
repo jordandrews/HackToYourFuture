@@ -1,19 +1,19 @@
 ﻿@model HackToYourFuture.ViewModels.IndexViewModel
 
 
-@using (Html.BeginForm("NewPlace","Home"))
+@using (Html.BeginForm("NewPlace", "Home"))
 {
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
         <div class="well">
             <input type="text" id="searchPlace" /><input type="submit" value="Add" class="btn btn-default" />
-            @Html.HiddenFor(model => model.NewPlace.Longitude, new { @class = "form-control", @id = "newLongitude"  })
+            @Html.HiddenFor(model => model.NewPlace.Longitude, new { @class = "form-control", @id = "newLongitude" })
             @Html.HiddenFor(model => model.NewPlace.Latitude, new { @class = "form-control", @id = "newLatitude" })
             @Html.HiddenFor(model => model.NewPlace.PlaceName, new { @class = "form-control", @id = "newPlaceName" })
 
-           <div id="commentDiv">
-               <span id="commentTitle"></span><br>
+            <div id="commentDiv">
+                <span id="commentTitle"></span><br>
                 @Html.TextBoxFor(x => x.NewComment.Text)
             </div>
         </div>
@@ -22,71 +22,145 @@
 }
 
 
+<div class="list-group col-md-3" id="resultlist" style="clear: both">
+    @foreach (var place in Model.Places)
+    {
+        <a class="list-group-item" data-toggle="collapse" href="#@place.PlaceID" aria-expanded="false" aria-controls="collapseExample">
+            @place.PlaceName
+        </a>
 
-@foreach(var place in Model.Places)
-{
-    <div>
-        @place.PlaceName
+    <div class="collapse" id="@place.PlaceID">
+        <div class="well">
 
+        </div>
     </div>
-}
 
 
 
+    }
 
+</div>    
 
-
-
-<div id="map-canvas" style="height: 500px"></div>
+<div id="map-canvas" class="col-md-9" style="height: 500px"></div>
 
 @section scripts {
 
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places"></script>
 
     <script>
-        $(document).ready(function () {
-            $("#commentDiv").hide();
-            var autocomplete;
-            function initialize() {
-                var mapOptions = {
-                    center: { lat: -37.814, lng: 144.953 },
-                    zoom: 12
-                };
-                var map = new google.maps.Map(document.getElementById('map-canvas'),
-                    mapOptions);
-            
-                var input = document.getElementById("searchPlace");
+    $(document).ready(function () {
+        var places = new Array();
+        @foreach(var place in Model.Places)
+        {
+            @:places.push({name: "@place.PlaceName", id: @place.PlaceID, latitude: @place.Latitude, longitude: @place.Longitude});       
+        }
+        console.log(places);
+        var map;
+        $("#commentDiv").hide();
+        var autocomplete;
+        function initialize() {
+            var mapOptions = {
+                center: { lat: -37.814, lng: 144.953 },
+                zoom: 12
+            };
+            map = new google.maps.Map(document.getElementById('map-canvas'),
+                mapOptions);
 
-                autocomplete = new google.maps.places.Autocomplete(input);
-                autocomplete.bindTo('bounds', map);
+            var input = document.getElementById("searchPlace");
 
-                google.maps.event.addListener(autocomplete, 'place_changed', function () {
+            autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.bindTo('bounds', map);
 
-                    var place = autocomplete.getPlace();
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
 
-                    $("#commentTitle").html("Comments for - " + place.name);
-                    $("#commentDiv").show();
-                    console.log(place.geometry.location.k);
-                    $("#newPlaceName").attr("value", place.name);
-                    $("#newLongitude").attr("value", place.geometry.location.k);
-                    $("#newLatitude").attr("value", place.geometry.location.D);
-                    console.log(place);
-                });
-            }
+                var place = autocomplete.getPlace();
 
-            google.maps.event.addDomListener(window, 'load', initialize);
-
-        
-
-            $.getJSON("@Url.Action("GetComments")", null, function (data) {
-                console.log(data);
-
-
-
+                $("#commentTitle").html("Comments for - " + place.name);
+                $("#commentDiv").show();
+                $("#newPlaceName").attr("value", place.name);
+                $("#newLatitude").attr("value", place.geometry.location.k);
+                $("#newLongitude").attr("value", place.geometry.location.D);
 
             });
 
 
-        });
-</script>
+
+
+            var flightPlanCoordinates = new Array();
+            for (var place in places)
+            {
+                console.log(places[place]);
+                buildMarker(places[place].longitude, places[place].latitude);
+                flightPlanCoordinates.push(new google.maps.LatLng(places[place].latitude, places[place].longitude));
+
+                $.getJSON("/Home/GetComments/?placeId="+places[place].id, null, function (data) {
+                    data = JSON.parse(data);
+                    var dateString = data[0].DateTime.match(/\d+/)[0];
+                    dateString = Math.round(parseInt(dateString));
+
+                    var date = new Date(dateString);
+                    var prettyDate = date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
+                    $("#" + data[0].PlaceID + " .well").html(data[0].Text + " - " + prettyDate );
+                    
+                    console.log(data[0].DateTime);
+                    console.log(dateString);
+                    console.log(date);
+                  //  console.log(data[0].DateTime);
+
+
+
+                });
+
+            }
+
+            var lineSymbol = {
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
+            };
+
+            console.log(flightPlanCoordinates);
+            var flightPath = new google.maps.Polyline({
+                path: flightPlanCoordinates,
+                geodesic: true,
+                icons: [{
+                    icon: lineSymbol,
+                    offset: '100%'
+                }],
+                strokeColor: '#000000',
+                strokeOpacity: 1.0,
+                strokeWeight: 3
+            });
+
+            flightPath.setMap(map);
+
+
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+
+
+        
+       
+
+        function setInfoWindows(title, comments) {
+            var contentString = '<table>'+
+            '<tr><td colspan="2"><h4>'+title+'</tr>'+
+            '<tr><td style="vertical-align: top">comments</td></tr>'+
+            '</table>';
+
+            infowindow.setContent(contentString);
+            infowindow.open(map,marker);
+
+        }
+
+        // Builds the marker
+        function buildMarker(longitude, latitude) {
+            var myLatlng = new google.maps.LatLng(latitude, longitude);
+            var marker = new google.maps.Marker({
+                position: myLatlng,
+                map: map,
+
+            });
+        }
+    });
+    </script>
 }
