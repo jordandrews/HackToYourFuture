@@ -287,7 +287,9 @@ namespace HackToYourFuture.Controllers
             {
                 thisssss.Append(item.ToString());
             }
-            JObject jjObj = (JObject) jArray["waypoint_order"];
+            JObject jjObj = (JObject)jArray.Last;
+            thisssss.Append(jjObj.ToString());
+
 
 
             return thisssss.ToString();
