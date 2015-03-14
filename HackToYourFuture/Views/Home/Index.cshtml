@@ -7,7 +7,16 @@
     </div>
 }
 
-<div id="map-canvas"></div>
+<div class="well">
+    <h3>Comments - "Place Name"</h3>
+    @Html.HiddenFor(x => x.NewComment.PlaceID)
+    @Html.TextBoxFor(x => x.NewComment.Text)
+
+</div>
+
+
+
+<div id="map-canvas" style="height: 500px"></div>
 
 @section scripts {
     <script src="https://maps.googleapis.com/maps/api/js"></script>

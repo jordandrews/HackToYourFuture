@@ -11,17 +11,14 @@ namespace HackToYourFuture.Models
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.Web.Script.Serialization;
     
     public partial class Comment
     {
         public int CommentID { get; set; }
-        [Required(ErrorMessage="Please enter a comment.", AllowEmptyStrings=false)]
-        public string Text { get; set; }
         public Nullable<System.DateTime> DateTime { get; set; }
         public Nullable<int> PlaceID { get; set; }
-        [ScriptIgnore]
+        public string Text { get; set; }
+    
         public virtual Place Place { get; set; }
     }
 }

@@ -122,7 +122,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Comment.cs">
-      <DependentUpon>HackModel.tt</DependentUpon>
+      <DependentUpon>HackModel2.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\HackModel.Context.cs">
       <AutoGen>True</AutoGen>
@@ -139,9 +139,24 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>HackModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\HackModel2.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HackModel2.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\HackModel2.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HackModel2.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\HackModel2.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HackModel2.edmx</DependentUpon>
+    </Compile>
     <Compile Include="Models\JsonComment.cs" />
     <Compile Include="Models\Place.cs">
-      <DependentUpon>HackModel.tt</DependentUpon>
+      <DependentUpon>HackModel2.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\IndexViewModel.cs" />
@@ -171,6 +186,23 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>HackModel.edmx</DependentUpon>
       <LastGenOutput>HackModel.cs</LastGenOutput>
+    </Content>
+    <EntityDeploy Include="Models\HackModel2.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>HackModel2.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\HackModel2.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>HackModel2.edmx</DependentUpon>
+      <LastGenOutput>HackModel2.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\HackModel2.edmx.diagram">
+      <DependentUpon>HackModel2.edmx</DependentUpon>
+    </Content>
+    <Content Include="Models\HackModel2.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>HackModel2.edmx</DependentUpon>
+      <LastGenOutput>HackModel2.cs</LastGenOutput>
     </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\custom.places.js" />

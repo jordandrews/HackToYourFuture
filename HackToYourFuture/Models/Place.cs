@@ -11,8 +11,6 @@ namespace HackToYourFuture.Models
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.Web.Script.Serialization;
     
     public partial class Place
     {
@@ -20,14 +18,12 @@ namespace HackToYourFuture.Models
         {
             this.Comments = new HashSet<Comment>();
         }
-        [Newtonsoft.Json.JsonIgnoreAttribute]
+    
         public int PlaceID { get; set; }
-        [Display(Name="Place Name")]
-        [Required(ErrorMessage="Place name is required.")]
-        public string PlaceName { get; set; }
-        public Nullable<double> Longitude { get; set; }
         public Nullable<double> Latitude { get; set; }
-        [ScriptIgnore]
+        public Nullable<double> Longitude { get; set; }
+        public string PlaceName { get; set; }
+    
         public virtual ICollection<Comment> Comments { get; set; }
     }
 }

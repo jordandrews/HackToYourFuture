@@ -18,7 +18,7 @@ namespace HackToYourFuture.Controllers
     {
         public ActionResult Index()
         {
-            using (HackToYourFutureEntities database = new HackToYourFutureEntities())
+            using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
                 var places = (from x in database.Places
                              select x).ToList();
@@ -30,12 +30,12 @@ namespace HackToYourFuture.Controllers
             }
         }
 
-        public JsonResult GetComments()
+        public JsonResult GetComments(int placeId)
         {
-            using (HackToYourFutureEntities database = new HackToYourFutureEntities())
+            using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
                 var comments = (from x in database.Comments
-                    where x.PlaceID == 1
+                    where x.PlaceID == placeId
                     select x).ToList();
                 List<JsonComment> list = new List<JsonComment>();
                 foreach (var comment in comments)
@@ -48,13 +48,8 @@ namespace HackToYourFuture.Controllers
                     list.Add(newComm);
                 }
                 
-
                 JavaScriptSerializer newSerializer = new JavaScriptSerializer();
                 String jsonList = newSerializer.Serialize(list);
-
-
-
-
 
                 return Json(jsonList, JsonRequestBehavior.AllowGet);
             }
@@ -63,7 +58,7 @@ namespace HackToYourFuture.Controllers
 
         public ActionResult NewComment(IndexViewModel viewModel)
         {
-            using (HackToYourFutureEntities database = new HackToYourFutureEntities())
+            using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
                 viewModel.NewComment.DateTime = DateTime.Now;
 
