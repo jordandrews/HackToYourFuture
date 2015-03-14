@@ -11,15 +11,12 @@ namespace HackToYourFuture.Models
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
     
     public partial class Comment
     {
         public int CommentID { get; set; }
         public Nullable<System.DateTime> DateTime { get; set; }
         public Nullable<int> PlaceID { get; set; }
-        [Display(Name="Comment")]
-        [Required(AllowEmptyStrings=false)]
         public string Text { get; set; }
     
         public virtual Place Place { get; set; }

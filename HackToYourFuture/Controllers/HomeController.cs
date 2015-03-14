@@ -71,12 +71,27 @@ namespace HackToYourFuture.Controllers
         [ActionName("NewPlace")]
         public ActionResult NewPlaceAndComment(IndexViewModel viewModel)
         {
-            using (HackToYourFutureEntities database = new HackToYourFutureEntities())
+            using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
                 viewModel.NewComment.DateTime = DateTime.Now;
 
+
+                Place thisPlace = new Place
+                {
+                    Latitude = viewModel.NewPlace.Latitude,
+                    Longitude = viewModel.NewPlace.Longitude,
+                    PlaceName = viewModel.NewPlace.PlaceName
+                };
+
+                database.Places.Add(thisPlace);
+                database.SaveChanges();
+
+               
+
+                int lastId = database.Places.Max(item => item.PlaceID);
+                viewModel.NewComment.PlaceID = lastId;
                 database.Comments.Add(viewModel.NewComment);
-                database.Places.Add(viewModel.NewPlace);
+               
 
                 database.SaveChanges();
                 return RedirectToAction("Index");

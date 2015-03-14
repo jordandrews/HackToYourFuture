@@ -11,7 +11,6 @@ namespace HackToYourFuture.Models
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
     
     public partial class Place
     {
@@ -23,8 +22,6 @@ namespace HackToYourFuture.Models
         public int PlaceID { get; set; }
         public Nullable<double> Latitude { get; set; }
         public Nullable<double> Longitude { get; set; }
-        [Display(Name="Place Name")]
-        [Required(AllowEmptyStrings=false)]
         public string PlaceName { get; set; }
     
         public virtual ICollection<Comment> Comments { get; set; }
