@@ -71,12 +71,22 @@ namespace HackToYourFuture.Controllers
         [ActionName("NewPlace")]
         public ActionResult NewPlaceAndComment(IndexViewModel viewModel)
         {
-            using (HackToYourFutureEntities database = new HackToYourFutureEntities())
+            using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
+
                 viewModel.NewComment.DateTime = DateTime.Now;
 
-                database.Comments.Add(viewModel.NewComment);
+
+                // viewModel.NewPlace.PlaceID = null;
                 database.Places.Add(viewModel.NewPlace);
+                database.SaveChanges();
+
+               
+
+                int lastId = database.Places.Max(item => item.PlaceID);
+                viewModel.NewComment.PlaceID = lastId;
+                database.Comments.Add(viewModel.NewComment);
+               
 
                 database.SaveChanges();
                 return RedirectToAction("Index");
@@ -93,7 +103,7 @@ namespace HackToYourFuture.Controllers
 
                 foreach(var place in places)
                 {
-                    Distance(place, places[place])
+                    // Distance(place, places[place])
                 }
 
 

@@ -23,7 +23,7 @@ namespace HackToYourFuture.Models
         public int PlaceID { get; set; }
         public Nullable<double> Latitude { get; set; }
         public Nullable<double> Longitude { get; set; }
-        []
+
         public string PlaceName { get; set; }
     
         public virtual ICollection<Comment> Comments { get; set; }

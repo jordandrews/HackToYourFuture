@@ -1,22 +1,22 @@
 ﻿@model HackToYourFuture.ViewModels.IndexViewModel
 
 
-@using (Html.BeginForm("NewPlace"))
+@using (Html.BeginForm("NewPlace","Home"))
 {
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
-        <input type="text" id="searchPlace" style="width: 250"/><input type="submit" value="Add" class="btn btn-default" />
-        @Html.HiddenFor(model => model.NewPlace.Longitude, new { htmlAttributes = new { @class = "form-control", @id = "newLongitude" } })
-        @Html.HiddenFor(model => model.NewPlace.Latitude, new { htmlAttributes = new { @class = "form-control", @id = "newLatitude" } })
-        @Html.HiddenFor(model => model.NewPlace.PlaceName, new { htmlAttributes = new { @class = "form-control", @id = "newPlaceName" } })
+        <div class="well">
+            <input type="text" id="searchPlace" /><input type="submit" value="Add" class="btn btn-default" />
+            @Html.HiddenFor(model => model.NewPlace.Longitude, new { @class = "form-control", @id = "newLongitude"  })
+            @Html.HiddenFor(model => model.NewPlace.Latitude, new { @class = "form-control", @id = "newLatitude" })
+            @Html.HiddenFor(model => model.NewPlace.PlaceName, new { @class = "form-control", @id = "newPlaceName" })
 
-    </div>
-    <div class="well">
-        <h3>Comments - "Place Name"</h3>
-        @Html.HiddenFor(x => x.NewComment.PlaceID)
-        @Html.TextBoxFor(x => x.NewComment.Text)
-
+           <div id="commentDiv">
+               <span id="commentTitle"></span><br>
+                @Html.TextBoxFor(x => x.NewComment.Text)
+            </div>
+        </div>
     </div>
 
 }
@@ -27,6 +27,7 @@
 {
     <div>
         @place.PlaceName
+
     </div>
 }
 
@@ -44,6 +45,7 @@
 
     <script>
         $(document).ready(function () {
+            $("#commentDiv").hide();
             var autocomplete;
             function initialize() {
                 var mapOptions = {
@@ -61,11 +63,13 @@
                 google.maps.event.addListener(autocomplete, 'place_changed', function () {
 
                     var place = autocomplete.getPlace();
+
+                    $("#commentTitle").html("Comments for - " + place.name);
+                    $("#commentDiv").show();
                     console.log(place.geometry.location.k);
-                    $("newPlaceName").val(place.name);
-                    $("newPlaceLongitude").val(place.name);
-                    $("newPlaceLatitude").val(place.geometry.location.k);
-                    $("newPlaceLongitude").val(place.geometry.location.D);
+                    $("#newPlaceName").attr("value", place.name);
+                    $("#newLongitude").attr("value", place.geometry.location.k);
+                    $("#newLatitude").attr("value", place.geometry.location.D);
                     console.log(place);
                 });
             }
