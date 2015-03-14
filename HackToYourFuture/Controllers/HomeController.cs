@@ -10,6 +10,8 @@ using System.Web.Script.Serialization;
 using System.Data.Entity;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using System.Net;
+using Newtonsoft.Json.Linq;
 
 namespace HackToYourFuture.Controllers
 
@@ -118,7 +120,7 @@ namespace HackToYourFuture.Controllers
                 for(int i=0;i<places.Length-1;i++)
                 {
                     double lowestDoubleYet = 100000;
-                    for (int j=0; j<places.Length-1;j++)
+                    for (int j=0; j<places.Length;j++)
                     {
                         if (j != i)
                         {
@@ -222,17 +224,16 @@ namespace HackToYourFuture.Controllers
             
         }
 
-        public Place[] FarthestApart()
+        private Place[] FarthestApart()
         {
-            
-            Place[] startEnd = new Place[2];
-
             using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
                 var places = (from x in database.Places
                          select x).ToArray();
 
-                for(int i=0;i<places.Length-1;i++)
+                Place[] startEnd = new Place[places.Length];
+
+                for(int i=0;i<places.Length;i++)
                 {
                     double highestDoubleYet = 0;
                     for (int j=0; j<places.Length-1;j++)
@@ -244,13 +245,52 @@ namespace HackToYourFuture.Controllers
                             {
                                 highestDoubleYet = tempDouble;
                                 startEnd[0] = places[i];
-                                startEnd[1] = places[j];
+                                startEnd[places.Length-1] = places[j];
                             }
                         }
                     }
                 }
+                int counter = 1;
+                foreach (var place in places)
+                {
+                    if (place.PlaceID != startEnd[0].PlaceID && place.PlaceID != startEnd[startEnd.Length-1].PlaceID)
+                    {
+                        startEnd[counter] = place;
+                        counter++;
+                    }
+                }
                 return startEnd;
             }
+        }
+
+        public String CalculateGoogle()
+        {
+            StringBuilder url = new StringBuilder();
+            Place[] places = FarthestApart();
+            url.Append("http://maps.googleapis.com/maps/api/directions/json?origin=");
+            url.Append(places[0].Latitude + "," + places[0].Longitude);
+            url.Append("&destination=" + places[places.Length - 1].Latitude + "," + places[places.Length - 1].Longitude);
+            url.Append("&waypoints=optimize:true");
+            
+            for (int i=1;i<places.Length-1;i++)
+            {
+                url.Append("|" + places[i].Latitude + "," + places[i].Longitude);
+            }
+            
+            WebClient web = new WebClient();
+
+            var data = web.DownloadString(url.ToString());
+            JObject jObj = JObject.Parse(data);
+            JArray jArray = (JArray) jObj["routes"];
+            StringBuilder thisssss = new StringBuilder();
+            foreach (var item in jArray)
+            {
+                thisssss.Append(item.ToString());
+            }
+            JObject jjObj = (JObject) jArray["waypoint_order"];
+
+
+            return thisssss.ToString();
         }
 
 
