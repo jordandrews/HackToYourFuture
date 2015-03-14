@@ -1,0 +1,19 @@
+﻿@model HackToYourFuture.ViewModels.IndexViewModel
+
+@foreach(var place in Model.Places)
+{
+    <div>
+        @place.PlaceName
+    </div>
+}
+
+@foreach (var comment in Model.Comments)
+{
+    <div>
+        @comment.Text
+    </div>
+}
+
+
+
+@Html.Action("GetComments", new { placeId = 1 })
