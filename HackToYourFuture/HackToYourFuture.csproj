@@ -139,6 +139,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>HackModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\JsonComment.cs" />
     <Compile Include="Models\Place.cs">
       <DependentUpon>HackModel.tt</DependentUpon>
     </Compile>

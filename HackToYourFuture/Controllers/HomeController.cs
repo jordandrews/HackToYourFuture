@@ -7,6 +7,9 @@ using HackToYourFuture.Models;
 using HackToYourFuture.ViewModels;
 using System.Text;
 using System.Web.Script.Serialization;
+using System.Data.Entity;
+using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace HackToYourFuture.Controllers
 
@@ -27,17 +30,31 @@ namespace HackToYourFuture.Controllers
             }
         }
 
-        public JsonResult GetComments(int placeId)
+        public JsonResult GetComments()
         {
             using (HackToYourFutureEntities database = new HackToYourFutureEntities())
             {
                 var comments = (from x in database.Comments
-                    where x.PlaceID == placeId
-                    select x).ToList(); 
+                    where x.PlaceID == 1
+                    select x).ToList();
+                List<JsonComment> list = new List<JsonComment>();
+                foreach (var comment in comments)
+                {
+                    JsonComment newComm = new JsonComment{
+                        PlaceID = (int) comment.PlaceID,
+                        DateTime = (DateTime) comment.DateTime,
+                        Text = comment.Text
+                    };
+                    list.Add(newComm);
+                }
                 
 
                 JavaScriptSerializer newSerializer = new JavaScriptSerializer();
-                String jsonList = newSerializer.Serialize(comments);
+                String jsonList = newSerializer.Serialize(list);
+
+
+
+
 
                 return Json(jsonList, JsonRequestBehavior.AllowGet);
             }

@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
-    $.getJSON("Home/GetComments/1", null, function (data) {
+    var url = @Url.Action("/Home/GetComments")
+    $.getJSON(url, null, function (data) {
         console.log(data)
 
 

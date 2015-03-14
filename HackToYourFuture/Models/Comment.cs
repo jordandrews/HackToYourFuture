@@ -12,6 +12,7 @@ namespace HackToYourFuture.Models
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.Web.Script.Serialization;
     
     public partial class Comment
     {
@@ -20,7 +21,7 @@ namespace HackToYourFuture.Models
         public string Text { get; set; }
         public Nullable<System.DateTime> DateTime { get; set; }
         public Nullable<int> PlaceID { get; set; }
-    
+        [ScriptIgnore]
         public virtual Place Place { get; set; }
     }
 }

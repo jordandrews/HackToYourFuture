@@ -7,16 +7,18 @@
     </div>
 }
 
-@foreach (var comment in Model.Comments)
-{
-    <div>
-        @comment.Text
-    </div>
+
+@section scripts {
+    <script>
+    $(document).ready(function () {
+ 
+        $.getJSON("@Url.Action("GetComments")", null, function (data) {
+            console.log(data);
+
+
+    });
+
+
+    });
+    </script>
 }
-
-
-
-@Html.Action("GetComments", new { placeId = 1 })
-
-
-@Scripts.Render("~/Scripts/custom.places");
