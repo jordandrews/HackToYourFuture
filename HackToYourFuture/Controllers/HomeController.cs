@@ -89,12 +89,76 @@ namespace HackToYourFuture.Controllers
             {
                 var places = (from x in database.Places
                              select x).ToArray();
-                List<int> placeIds = new List<int>();
+                int[] finishedPlaceIds = new int[places.Length];
 
-                foreach(var place in places)
+                Place firstPlace1 = null;
+                Place firstPlace2 = null;
+                int firstPlace1Index = 0;
+                int firstPlace2Index = 0;
+
+                /*
+                 * Firstly, find the two points with the shortest distance between them.
+                 */
+
+                for(int i=0;i<places.Length-1;i++)
                 {
-                    Distance(place, places[place])
+                    double lowestDoubleYet = 100000;
+                    for (int j=0; j<places.Length-1;j++)
+                    {
+                        if (j != i)
+                        {
+                            double tempDouble = Distance(places[i], places[j]);
+
+                            if (tempDouble < lowestDoubleYet)
+                            {
+                                lowestDoubleYet = tempDouble;
+                                firstPlace1 = places[i];
+                                firstPlace1Index = i;
+                                firstPlace2 = places[j];
+                                firstPlace2Index =j;
+                            }
+                        }
+                    }
                 }
+
+                Place firstPlace3 = null;
+
+                /*
+                 * Then, find the shortest distance to another point
+                 * from either the first or second point. 
+                 */
+
+                for (int i = 0; i < places.Length; i++ )
+                {
+                    double lowestDoubleYet = 100000;
+                    double tempDouble;
+                    if (i != firstPlace1Index)
+                    {
+                        tempDouble = Distance(firstPlace1, places[i]);
+                        if (tempDouble < lowestDoubleYet)
+                        {
+                            lowestDoubleYet = tempDouble;
+                            firstPlace3 = firstPlace2;
+                            firstPlace2 = firstPlace1;
+                            firstPlace1 = firstPlace3;
+                            firstPlace3 = places[i];
+                        }
+
+                    }
+                    if (i != firstPlace2Index)
+                    {
+                        tempDouble = Distance(firstPlace2, places[i]);
+                        if (tempDouble < lowestDoubleYet)
+                        {
+                            lowestDoubleYet = tempDouble;
+                            firstPlace3 = places[i];
+                        }
+                    }
+                }
+
+                finishedPlaceIds[0] = firstPlace1.PlaceID;
+                finishedPlaceIds[1] = firstPlace2.PlaceID;
+
 
 
                 return View();
