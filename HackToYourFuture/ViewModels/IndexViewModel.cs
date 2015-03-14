@@ -11,7 +11,6 @@ namespace HackToYourFuture.ViewModels
     {
         public List<Comment> Comments { get; set; }
         public List<Place> Places {get; set;}
-
         public Comment NewComment { get; set; }
         public Place NewPlace { get; set; }
     }
