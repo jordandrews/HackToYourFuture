@@ -30,7 +30,7 @@ namespace HackToYourFuture.Controllers
             }
         }
 
-        public JsonResult GetComments(int placeId)
+        public JsonResult GetComments(int? placeId)
         {
             using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
@@ -104,7 +104,6 @@ namespace HackToYourFuture.Controllers
             {
                 var places = (from x in database.Places
                              select x).ToArray();
-                int[] finishedPlaceIds = new int[places.Length];
                 Place[] finishedPlaces = new Place[places.Length];
 
                 Place firstPlace1 = null;
@@ -197,6 +196,10 @@ namespace HackToYourFuture.Controllers
                     finishedPlaces[i] = placeToAdd;
                 }
 
+                /*
+                 * Finally, create Json Objects and then return them.   
+                 */
+
                 List<JsonPlace> myJson = new List<JsonPlace>();
                 foreach (var item in finishedPlaces)
                 {
@@ -218,6 +221,39 @@ namespace HackToYourFuture.Controllers
             }
             
         }
+
+        public Place[] FarthestApart()
+        {
+            
+            Place[] startEnd = new Place[2];
+
+            using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
+            {
+                var places = (from x in database.Places
+                         select x).ToArray();
+
+                for(int i=0;i<places.Length-1;i++)
+                {
+                    double highestDoubleYet = 0;
+                    for (int j=0; j<places.Length-1;j++)
+                    {
+                        if (j != i)
+                        {
+                            double tempDouble = Distance(places[i], places[j]);
+                            if (tempDouble > highestDoubleYet)
+                            {
+                                highestDoubleYet = tempDouble;
+                                startEnd[0] = places[i];
+                                startEnd[1] = places[j];
+                            }
+                        }
+                    }
+                }
+                return startEnd;
+            }
+        }
+
+
 
         /*
          * Adapted from http://www.geodatasource.com/developers/c-sharp 
