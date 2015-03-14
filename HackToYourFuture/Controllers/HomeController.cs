@@ -263,7 +263,7 @@ namespace HackToYourFuture.Controllers
             }
         }
 
-        public String CalculateGoogle()
+        public JsonResult CalculateGoogle()
         {
             StringBuilder url = new StringBuilder();
             Place[] places = FarthestApart();
@@ -283,16 +283,37 @@ namespace HackToYourFuture.Controllers
             JObject jObj = JObject.Parse(data);
             JArray jArray = (JArray) jObj["routes"];
             StringBuilder thisssss = new StringBuilder();
-            foreach (var item in jArray)
-            {
-                thisssss.Append(item.ToString());
-            }
+
             JObject jjObj = (JObject)jArray.Last;
-            thisssss.Append(jjObj.ToString());
+            JProperty last = (JProperty)jjObj.Last;
+            JArray lastArray = (JArray) last.First;
+            int[] placesToFix = lastArray.Select(jv => (int)jv).ToArray();
 
+            Place[] finalPlaces = new Place[places.Length];
+            finalPlaces[0] = places[0];
+            finalPlaces[finalPlaces.Length-1] = places[finalPlaces.Length -1];
+            
+            for (int i = 0; i < placesToFix.Length; i++)
+            {
+                finalPlaces[i+1] = places[placesToFix[i] + 1];
+            }
+            List<JsonPlace> jsonPlaces = new List<JsonPlace>();
+            
+            foreach (var place in finalPlaces)
+            {
+                var jsonPlace = new JsonPlace
+                {
+                    PlaceName = place.PlaceName,
+                    Latitude = place.Latitude,
+                    Longitude = place.Longitude
+                };
+                jsonPlaces.Add(jsonPlace);
+            }
 
+            JavaScriptSerializer newSerializer = new JavaScriptSerializer();
+            String jsonList = newSerializer.Serialize(jsonPlaces);
 
-            return thisssss.ToString();
+            return Json(jsonList, JsonRequestBehavior.AllowGet);
         }
 
 
