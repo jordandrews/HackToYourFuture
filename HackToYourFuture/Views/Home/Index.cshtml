@@ -95,10 +95,12 @@
 
 
         function initialize() {
+            console.log("initialize called");
             var mapOptions = {
                 center: { lat: -37.814, lng: 144.953 },
                 zoom: 12
             };
+            
             map = new google.maps.Map(document.getElementById('map-canvas'),
                 mapOptions);
 
@@ -119,16 +121,14 @@
 
 
             });
-
-
-
-
+         
+            
+      
           
             for (var place in places)
             {
-                console.log("places in loop" + place);
                 var newplace = places[place];
-                flightPlanCoordinates.push(new google.maps.LatLng(newplace.latitude, newplace.longitude));
+               // flightPlanCoordinates.push(new google.maps.LatLng(newplace.latitude, newplace.longitude));
                 returnComments(newplace);
 
               
@@ -142,13 +142,9 @@
             var flightPath = new google.maps.Polyline({
                 path: flightPlanCoordinates,
                 geodesic: true,
-                icons: [{
-                    icon: lineSymbol,
-                    offset: '100%'
-                }],
-                strokeColor: '#000000',
+                strokeColor: '#FF0000',
                 strokeOpacity: 1.0,
-                strokeWeight: 3
+                strokeWeight: 2
             });
 
             flightPath.setMap(map);
@@ -156,13 +152,30 @@
 
         }
 
-        google.maps.event.addDomListener(window, 'load', initialize);
 
+
+        $.getJSON("/Home/CalculateGoogle", null, function (data) {
+                data = JSON.parse(data);
+                for (var place in data) {
+                    var latitude = parseFloat(data[place].Latitude);
+                    var longitude = parseFloat(data[place].Longitude);
+                    console.log(latitude);
+                    flightPlanCoordinates.push(new google.maps.LatLng(latitude, longitude));
+
+                }
+                initialize();
+                google.maps.event.addDomListener(window, 'load', initialize);
+
+            });
+
+            
+
+ 
 
         function returnComments(place) {
 
             $.getJSON("/Home/GetComments/?placeId="+place.id, null, function (data) {
-                console.log("in getjson" + place);
+                // console.log("in getjson" + place);
                 data = JSON.parse(data);
                 var dateString = data[0].DateTime.match(/\d+/)[0];
                 dateString = Math.round(parseInt(dateString));
@@ -195,7 +208,7 @@
         // Builds the marker
         function buildMarker(longitude, latitude, name, id) {
             var myLatlng = new google.maps.LatLng(latitude, longitude);
-            console.log(id);
+           // console.log(id);
             var comments = $("#" + id + " .well").html();
             // console.log(comments);
             var marker = new google.maps.Marker({
