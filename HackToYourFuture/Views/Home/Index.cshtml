@@ -16,7 +16,7 @@
 
     <div class="form-horizontal">
         <div class="well">
-            <input type="text" id="searchPlace" /><input type="submit" value="Add" class="btn btn-default" />
+            <input type="text" id="searchPlace" /><input type="submit" id="addSubmit" value="Add" class="btn btn-default" />
             @Html.HiddenFor(model => model.NewPlace.Longitude, new { @class = "form-control", @id = "newLongitude" })
             @Html.HiddenFor(model => model.NewPlace.Latitude, new { @class = "form-control", @id = "newLatitude" })
             @Html.HiddenFor(model => model.NewPlace.PlaceName, new { @class = "form-control", @id = "newPlaceName" })
@@ -84,6 +84,7 @@
 
     <script>
         $(document).ready(function () {
+            $("#addSubmit").attr('disabled','disabled');
             // Ininitalise Variables
         var flightPlanCoordinates = new Array();
         var places = new Array();
@@ -135,7 +136,7 @@
             google.maps.event.addListener(autocomplete, 'place_changed', function () {
 
                 var place = autocomplete.getPlace();
-
+                $("#addSubmit").removeAttr('disabled');
                 $("#commentTitle").html("Comments for - " + place.name);
                 $("#commentDiv").show();
                 $("#newPlaceName").attr("value", place.name);
@@ -165,9 +166,13 @@
             var flightPath = new google.maps.Polyline({
                 path: flightPlanCoordinates,
                 geodesic: true,
+                icons: [{
+                    icon: lineSymbol,
+                    offset: '100%'
+                }],
                 strokeColor: '#FF0000',
                 strokeOpacity: 1.0,
-                strokeWeight: 2
+                strokeWeight: 4
             });
 
             flightPath.setMap(map);

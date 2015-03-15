@@ -399,6 +399,8 @@ namespace HackToYourFuture.Controllers
             return dist;
         }
 
+        
+
         private double DegreesToRadians(double deg)
         {
             return (deg * Math.PI / 180.0);
