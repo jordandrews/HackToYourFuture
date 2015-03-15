@@ -34,7 +34,7 @@
 
 <div class="list-group col-md-3" id="resultlist" style="clear: both">
     <div class="list-group-item">
-        <h3 class="text-warning">
+        <h3 class="previousplace">
             Previous Places
         </h3>
     </div>
@@ -111,7 +111,7 @@
             var itemInt = $(this).attr("href");
             var realid = itemInt.substring(1);
             setInfoWindows(mapmarkers[realid]);
-            $("#newPlaceID").val(itemInt);
+            $("#newPlaceID").val(realid);
 
             $("#commentForm").appendTo(itemInt + " .well");
             $("#commentForm").show();
