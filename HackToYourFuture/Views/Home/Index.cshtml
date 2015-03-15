@@ -48,13 +48,19 @@
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places"></script>
 
     <script>
-    $(document).ready(function () {
+        $(document).ready(function () {
+            // Ininitalise Variables
+        var flightPlanCoordinates = new Array();
         var places = new Array();
         @foreach(var place in Model.Places)
         {
             @:places.push({name: "@place.PlaceName", id: @place.PlaceID, latitude: @place.Latitude, longitude: @place.Longitude});       
         }
-        console.log(places);
+
+            var infowindow = new google.maps.InfoWindow({
+                content: "",
+                maxWidth: 375
+            });
         var map;
         $("#commentDiv").hide();
         var autocomplete;
@@ -86,30 +92,15 @@
 
 
 
-            var flightPlanCoordinates = new Array();
+          
             for (var place in places)
             {
-                console.log(places[place]);
-                buildMarker(places[place].longitude, places[place].latitude);
-                flightPlanCoordinates.push(new google.maps.LatLng(places[place].latitude, places[place].longitude));
+                console.log("places in loop" + place);
+                var newplace = places[place];
+                flightPlanCoordinates.push(new google.maps.LatLng(newplace.latitude, newplace.longitude));
+                returnComments(newplace);
 
-                $.getJSON("/Home/GetComments/?placeId="+places[place].id, null, function (data) {
-                    data = JSON.parse(data);
-                    var dateString = data[0].DateTime.match(/\d+/)[0];
-                    dateString = Math.round(parseInt(dateString));
-
-                    var date = new Date(dateString);
-                    var prettyDate = date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
-                    $("#" + data[0].PlaceID + " .well").html(data[0].Text + " - " + prettyDate );
-                    
-                    console.log(data[0].DateTime);
-                    console.log(dateString);
-                    console.log(date);
-                  //  console.log(data[0].DateTime);
-
-
-
-                });
+              
 
             }
 
@@ -117,7 +108,6 @@
                 path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
             };
 
-            console.log(flightPlanCoordinates);
             var flightPath = new google.maps.Polyline({
                 path: flightPlanCoordinates,
                 geodesic: true,
@@ -138,13 +128,32 @@
         google.maps.event.addDomListener(window, 'load', initialize);
 
 
-        
+        function returnComments(place) {
+
+            $.getJSON("/Home/GetComments/?placeId="+place.id, null, function (data) {
+                console.log("in getjson" + place);
+                data = JSON.parse(data);
+                var dateString = data[0].DateTime.match(/\d+/)[0];
+                dateString = Math.round(parseInt(dateString));
+
+                var date = new Date(dateString);
+                var prettyDate = date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
+                $("#" + data[0].PlaceID + " .well").html(data[0].Text + " - " + prettyDate );
+                buildMarker(place.longitude, place.latitude, place.name, place.id);
+               
+                   
+                    
+
+            });
+
+
+        }
        
 
-        function setInfoWindows(title, comments) {
+        function setInfoWindows(marker) {
             var contentString = '<table>'+
-            '<tr><td colspan="2"><h4>'+title+'</tr>'+
-            '<tr><td style="vertical-align: top">comments</td></tr>'+
+            '<tr><td colspan="2"><h4>'+marker.title+'</tr>'+
+            '<tr><td style="vertical-align: top">'+marker.comments+'</td></tr>'+
             '</table>';
 
             infowindow.setContent(contentString);
@@ -153,13 +162,26 @@
         }
 
         // Builds the marker
-        function buildMarker(longitude, latitude) {
+        function buildMarker(longitude, latitude, name, id) {
             var myLatlng = new google.maps.LatLng(latitude, longitude);
+            console.log(id);
+            var comments = $("#" + id + " .well").html();
+            // console.log(comments);
             var marker = new google.maps.Marker({
                 position: myLatlng,
                 map: map,
+                title: name,
+                comments: comments
 
             });
+
+            google.maps.event.addListener(marker, 'click', function() {
+
+                setInfoWindows(this);
+
+
+            });
+
         }
     });
     </script>
