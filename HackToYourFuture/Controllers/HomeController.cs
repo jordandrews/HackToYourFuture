@@ -284,10 +284,9 @@ namespace HackToYourFuture.Controllers
                 Place[] startEnd = new Place[places.Length];
 
                 //Below for adds the first and last Places.
-
+                double highestDoubleYet = 0;
                 for(int i=0;i<places.Length;i++)
                 {
-                    double highestDoubleYet = 0;
                     for (int j=0; j<places.Length-1;j++)
                     {
                         if (j != i)
@@ -296,6 +295,7 @@ namespace HackToYourFuture.Controllers
                             if (tempDouble > highestDoubleYet)
                             {
                                 highestDoubleYet = tempDouble;
+                                Debug.WriteLine(tempDouble + places[i].PlaceName + places[j].PlaceName);
                                 startEnd[0] = places[i];
                                 startEnd[places.Length-1] = places[j];
                             }
