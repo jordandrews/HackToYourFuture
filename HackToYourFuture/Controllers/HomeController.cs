@@ -36,7 +36,13 @@ namespace HackToYourFuture.Controllers
                 {
                     Places = places
                 };
+
+                if ((string)TempData["ErrorMessage"] != null)
+                {
+                    ViewBag.Message = TempData["ErrorMessage"].ToString();
+                }
                 return View(viewModel);
+
             }
         }
 
@@ -89,9 +95,14 @@ namespace HackToYourFuture.Controllers
         {
             using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
-                viewModel.NewComment.DateTime = DateTime.Now;
-                database.Comments.Add(viewModel.NewComment);
-                database.SaveChanges();
+                if (ModelState.IsValid)
+                {
+                    viewModel.NewComment.DateTime = DateTime.Now;
+                    database.Comments.Add(viewModel.NewComment);
+                    database.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                TempData["ErrorMessage"] = "Please make sure you enter a valid comment!";
                 return RedirectToAction("Index");
             }
         }
@@ -106,16 +117,20 @@ namespace HackToYourFuture.Controllers
         {
             using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
+                if (ModelState.IsValid)
+                {
+                    database.Places.Add(viewModel.NewPlace);
+                    database.SaveChanges();
 
-                database.Places.Add(viewModel.NewPlace);
-                database.SaveChanges();
+                    int lastId = database.Places.Max(item => item.PlaceID);
+                    viewModel.NewComment.DateTime = DateTime.Now;
+                    viewModel.NewComment.PlaceID = lastId;
+                    database.Comments.Add(viewModel.NewComment);
 
-                int lastId = database.Places.Max(item => item.PlaceID);
-                viewModel.NewComment.DateTime = DateTime.Now;
-                viewModel.NewComment.PlaceID = lastId;
-                database.Comments.Add(viewModel.NewComment);
-               
-                database.SaveChanges();
+                    database.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                TempData["ErrorMessage"] = "Please make sure you enter a valid comment!";
                 return RedirectToAction("Index");
             }
         }
