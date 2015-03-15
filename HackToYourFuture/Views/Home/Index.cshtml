@@ -77,6 +77,7 @@
             // Ininitalise Variables
         var flightPlanCoordinates = new Array();
         var places = new Array();
+        var mapmarkers = {};
         @foreach(var place in Model.Places)
         {
             @:places.push({name: "@place.PlaceName", id: @place.PlaceID, latitude: @place.Latitude, longitude: @place.Longitude});       
@@ -94,7 +95,10 @@
 
         $(".list-group-item").on("click",function(){
             var itemInt = $(this).attr("href");
+            var realid = itemInt.substring(1);
+            setInfoWindows(mapmarkers[realid]);
             $("#newPlaceID").val(itemInt);
+
             $("#commentForm").appendTo(itemInt + " .well");
             $("#commentForm").show();
         });
@@ -183,14 +187,19 @@
             $.getJSON("/Home/GetComments/?placeId="+place.id, null, function (data) {
                 // console.log("in getjson" + place);
                 data = JSON.parse(data);
-                var dateString = data[0].DateTime.match(/\d+/)[0];
-                dateString = Math.round(parseInt(dateString));
+                for (var comment in data) {
+                    var dateString = data[comment].DateTime.match(/\d+/)[0];
+                    dateString = Math.round(parseInt(dateString));
 
-                var date = new Date(dateString);
-                var prettyDate = date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
-                $("#" + data[0].PlaceID + " .well").html(data[0].Text + " - " + prettyDate );
-                buildMarker(place.longitude, place.latitude, place.name, place.id);
+                    var date = new Date(dateString);
+                    var prettyDate = date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
+                    $("#" + data[comment].PlaceID + " .well").append(data[comment].Text + " - " + prettyDate + "<br />"  );
                
+
+
+                }
+                
+                buildMarker(place.longitude, place.latitude, place.name, place.id);
                    
                     
 
@@ -224,7 +233,7 @@
                 comments: comments
 
             });
-
+            mapmarkers[id] = marker;
             google.maps.event.addListener(marker, 'click', function() {
 
                 setInfoWindows(this);
