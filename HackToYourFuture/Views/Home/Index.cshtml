@@ -104,6 +104,9 @@
         $("#commentForm").hide();
 
         $(".list-group-item").on("click",function(){
+        
+          
+
             var itemInt = $(this).attr("href");
             var realid = itemInt.substring(1);
             setInfoWindows(mapmarkers[realid]);
