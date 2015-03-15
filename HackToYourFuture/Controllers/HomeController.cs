@@ -358,17 +358,18 @@ namespace HackToYourFuture.Controllers
             {
                 finalPlaces[i+1] = places[placesToFix[i] + 1];
             }
-            List<JsonPlace> jsonPlaces = new List<JsonPlace>();
-            
-            foreach (var place in finalPlaces)
+
+            JsonPlace[] jsonPlaces = new JsonPlace[places.Length];
+
+            for (int i=0;i<finalPlaces.Length;i++)
             {
                 var jsonPlace = new JsonPlace
                 {
-                    PlaceName = place.PlaceName,
-                    Latitude = place.Latitude,
-                    Longitude = place.Longitude
+                    PlaceName = finalPlaces[i].PlaceName,
+                    Latitude = finalPlaces[i].Latitude,
+                    Longitude = finalPlaces[i].Longitude
                 };
-                jsonPlaces.Add(jsonPlace);
+                jsonPlaces[i] = jsonPlace;
             }
 
             JavaScriptSerializer newSerializer = new JavaScriptSerializer();
