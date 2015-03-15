@@ -338,18 +338,19 @@ namespace HackToYourFuture.Controllers
                 url.Append("|" + places[i].Latitude + "," + places[i].Longitude);
             }
             
-            WebClient web = new WebClient();
+            //Following code group retrieves JSON data from URL and parses it into an array.
+            //This array contains the best optimal order for the centre parts
 
+            WebClient web = new WebClient();
             var data = web.DownloadString(url.ToString());
             JObject jObj = JObject.Parse(data);
             JArray jArray = (JArray) jObj["routes"];
-            StringBuilder thisssss = new StringBuilder();
-
             JObject jjObj = (JObject)jArray.Last;
             JProperty last = (JProperty)jjObj.Last;
             JArray lastArray = (JArray) last.First;
             int[] placesToFix = lastArray.Select(jv => (int)jv).ToArray();
 
+            //Using this array of optimal order, puts the Places in the best order.
             Place[] finalPlaces = new Place[places.Length];
             finalPlaces[0] = places[0];
             finalPlaces[finalPlaces.Length-1] = places[finalPlaces.Length -1];
