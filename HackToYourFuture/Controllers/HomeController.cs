@@ -18,6 +18,14 @@ namespace HackToYourFuture.Controllers
 {
     public class HomeController : Controller
     {
+        /*
+         * Index method simply retrieves all Place items from 
+         * the database and adds them to the ViewModel, to be
+         * displayed in the view.
+         * 
+         * All of the comments and other data is generated using
+         * JSON Requests to avoid page loading.
+         */
         public ActionResult Index()
         {
             using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
@@ -32,6 +40,13 @@ namespace HackToYourFuture.Controllers
             }
         }
 
+        /*
+         * The GetComments method is only called through the
+         * javascript on the page, when a 'Place' panel is 
+         * clicked on. It retrieves the relevant comments 
+         * from the database and displays them underneath.
+         */
+
         public JsonResult GetComments(int? placeId)
         {
             using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
@@ -39,6 +54,13 @@ namespace HackToYourFuture.Controllers
                 var comments = (from x in database.Comments
                     where x.PlaceID == placeId
                     select x).ToList();
+
+                //Because of the way that .NET EF creates objects, 
+                //we've had to create JSON-Friendly classes without
+                //the relationship across classes. The following loop
+                //is instantiating one of these classes for every 
+                //standard class.
+
                 List<JsonComment> list = new List<JsonComment>();
                 foreach (var comment in comments)
                 {
@@ -58,47 +80,53 @@ namespace HackToYourFuture.Controllers
 
         }
 
+        /*
+         * On post, the following method inserts a new comment into the database.  
+         */
+        [HttpPost]
+        [ActionName("NewComment")]
         public ActionResult NewComment(IndexViewModel viewModel)
         {
             using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
                 viewModel.NewComment.DateTime = DateTime.Now;
-
                 database.Comments.Add(viewModel.NewComment);
                 database.SaveChanges();
                 return RedirectToAction("Index");
             }
         }
+        /*
+         * This method is called when a user clicks 'Add'.
+         * It first inserts the new Place and then inserts
+         * the Comment.
+         */
         [HttpPost]
         [ActionName("NewPlace")]
         public ActionResult NewPlaceAndComment(IndexViewModel viewModel)
         {
             using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
             {
-                viewModel.NewComment.DateTime = DateTime.Now;
 
-
-                Place thisPlace = new Place
-                {
-                    Latitude = viewModel.NewPlace.Latitude,
-                    Longitude = viewModel.NewPlace.Longitude,
-                    PlaceName = viewModel.NewPlace.PlaceName
-                };
-
-                database.Places.Add(thisPlace);
+                database.Places.Add(viewModel.NewPlace);
                 database.SaveChanges();
 
-               
-
                 int lastId = database.Places.Max(item => item.PlaceID);
+                viewModel.NewComment.DateTime = DateTime.Now;
                 viewModel.NewComment.PlaceID = lastId;
                 database.Comments.Add(viewModel.NewComment);
                
-
                 database.SaveChanges();
                 return RedirectToAction("Index");
             }
         }
+
+        /*
+         * This is our method of attempting to solve the final calculation. 
+         * The premise behind this was to first find the closest two points, 
+         * then to find the next shortest route to any third point, from either
+         * of those two initial points. From the third point, it takes the
+         * immediate shortest every time to the final point. 
+         */
 
         public JsonResult Calculate()
         {
@@ -224,6 +252,13 @@ namespace HackToYourFuture.Controllers
             
         }
 
+        /*
+         * This method compares the distance between every set of two points and
+         * finds the two points that are furthest apart. It returns an array
+         * these two at the start and end, and the points in the middle are 
+         * added arbitrarily.
+         */
+
         private Place[] FarthestApart()
         {
             using (HackToYourFutureEntities2 database = new HackToYourFutureEntities2())
@@ -232,6 +267,8 @@ namespace HackToYourFuture.Controllers
                          select x).ToArray();
 
                 Place[] startEnd = new Place[places.Length];
+
+                //Below for adds the first and last Places.
 
                 for(int i=0;i<places.Length;i++)
                 {
@@ -250,6 +287,9 @@ namespace HackToYourFuture.Controllers
                         }
                     }
                 }
+
+                //The below foreach loop adds in the remaining Places between.
+
                 int counter = 1;
                 foreach (var place in places)
                 {
@@ -263,10 +303,16 @@ namespace HackToYourFuture.Controllers
             }
         }
 
+        /*
+         * This method uses the Google Maps API to calculate the optimal route between two places,
+         * given a set of waypoints. It uses the Google Maps JSON to arrange the places and return
+         * the result via javascript.
+         */
+
         public JsonResult CalculateGoogle()
         {
             StringBuilder url = new StringBuilder();
-            Place[] places = FarthestApart();
+            Place[] places = FarthestApart(); // returns array with correct start/end points and arbitrary remaining
             url.Append("http://maps.googleapis.com/maps/api/directions/json?origin=");
             url.Append(places[0].Latitude + "," + places[0].Longitude);
             url.Append("&destination=" + places[places.Length - 1].Latitude + "," + places[places.Length - 1].Longitude);
@@ -320,6 +366,7 @@ namespace HackToYourFuture.Controllers
 
         /*
          * Adapted from http://www.geodatasource.com/developers/c-sharp 
+         * Calculates the distance from any two places on Earth using lat/long.
          */
         private double Distance(Place place1, Place place2)
         {

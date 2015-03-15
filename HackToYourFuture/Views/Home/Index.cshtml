@@ -41,6 +41,25 @@
 
 </div>    
 
+<div class="well" id="commentForm">
+
+@using (Html.BeginForm("NewComment", "Home"))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-inline">
+        <div class="well" id="something">
+            @Html.TextBoxFor(x=> x.NewComment.Text)
+            <input type="submit" value="Add" class="btn btn-default" />
+            @Html.HiddenFor(model => model.NewComment.PlaceID, new { @class = "form-control", @id = "newPlaceID" })
+            <div id="commentDiv">
+        </div>
+    </div>
+    </div>
+}
+
+</div>
+
 <div id="map-canvas" class="col-md-9" style="height: 500px"></div>
 
 @section scripts {
@@ -64,6 +83,17 @@
         var map;
         $("#commentDiv").hide();
         var autocomplete;
+
+        $("#commentForm").hide();
+
+        $(".list-group-item").on("click",function(){
+            var itemInt = $(this).attr("href");
+            $("#newPlaceID").val(itemInt);
+            $("#commentForm").appendTo(itemInt + " .well");
+            $("#commentForm").show();
+        });
+
+
         function initialize() {
             var mapOptions = {
                 center: { lat: -37.814, lng: 144.953 },
@@ -86,6 +116,7 @@
                 $("#newPlaceName").attr("value", place.name);
                 $("#newLatitude").attr("value", place.geometry.location.k);
                 $("#newLongitude").attr("value", place.geometry.location.D);
+
 
             });
 
