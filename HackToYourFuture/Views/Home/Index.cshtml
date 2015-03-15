@@ -23,6 +23,12 @@
 
 
 <div class="list-group col-md-3" id="resultlist" style="clear: both">
+    <div class="list-group-item">
+        <h3 class="text-warning">
+            Previous Places
+        </h3>
+    </div>
+
     @foreach (var place in Model.Places)
     {
         <a class="list-group-item" data-toggle="collapse" href="#@place.PlaceID" aria-expanded="false" aria-controls="collapseExample">
