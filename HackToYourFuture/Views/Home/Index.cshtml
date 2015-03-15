@@ -111,7 +111,7 @@
             var itemInt = $(this).attr("href");
             var realid = itemInt.substring(1);
             setInfoWindows(mapmarkers[realid]);
-            $("#newPlaceID").val(itemInt);
+            $("#newPlaceID").val(itemInt.substring(1));
 
             $("#commentForm").appendTo(itemInt + " .well");
             $("#commentForm").show();
